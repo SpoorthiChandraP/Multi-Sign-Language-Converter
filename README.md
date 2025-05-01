@@ -1,4 +1,4 @@
-# AI - Based Multi Sign Language Converter For Speech and Text Communication 
+# AI-Based Multi Sign Language Converter For Speech and Text Communication 
 
 ## 📖 Overview
 
@@ -66,7 +66,7 @@ These datasets were used to train and validate machine learning models for gestu
 
 ## 🧠 How to Use This Project
 
-Follow the steps below to set up and run the AI - Based Multi Sign Language Converter:
+Follow the steps below to set up and run the AI-Based Multi Sign Language Converter:
 
 ### 🔁 Step 1: Clone the Repository
 
