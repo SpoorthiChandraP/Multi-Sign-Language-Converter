@@ -71,7 +71,7 @@ Follow the steps below to set up and run the AI - Based Multi Sign Language Conv
 ### 🔁 Step 1: Clone the Repository
 
     '''
-    git clone [https://github.com/Niharika-Varshney/Multi-Sign-language-Speech-and-Text-Converter](https://github.com/SpoorthiChandraP/Multi-Sign-Language-Converter.git)
+    git clone https://github.com/SpoorthiChandraP/Multi-Sign-Language-Converter.git
     cd Multi-Sign-language-Speech-and-Text-Converter
     '''
 
@@ -88,9 +88,9 @@ Follow the steps below to set up and run the AI - Based Multi Sign Language Conv
 ### 🧪 Step 3: Data Augmentation (Optional)
 If needed, run the augmentation script to increase dataset size:
 
-    ```sh
-    python Data_Augmentation.py
-      ```
+  ```sh
+  python Data_Augmentation.py
+  ```
 
 ### ⚙️ Step 4: Data Processing
 
