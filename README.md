@@ -70,7 +70,6 @@ Follow the steps below to set up and run the AI - Based Multi Sign Language Conv
 
 ### 🔁 Step 1: Clone the Repository
 
-```bash
 git clone [https://github.com/Niharika-Varshney/Multi-Sign-language-Speech-and-Text-Converter](https://github.com/SpoorthiChandraP/Multi-Sign-Language-Converter.git)
 cd Multi-Sign-language-Speech-and-Text-Converter
 
