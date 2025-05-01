@@ -73,7 +73,7 @@ Follow the steps below to set up and run the AI - Based Multi Sign Language Conv
 git clone [https://github.com/Niharika-Varshney/Multi-Sign-language-Speech-and-Text-Converter](https://github.com/SpoorthiChandraP/Multi-Sign-Language-Converter.git)
 cd Multi-Sign-language-Speech-and-Text-Converter
 
-📥 Step 2: Download Datasets
+### 📥 Step 2: Download Datasets
 Download the following datasets from Kaggle and save them into the specified folders:
 
 American Sign Language (ASL)
@@ -84,11 +84,11 @@ Indian Sign Language (ISL)
 Download the [Indian Sign Language Dataset from Kaggle](https://www.kaggle.com/datasets/vaishnaviasonawane/indian-sign-language-dataset).
 Save the dataset into a directory named Data_ISL.
 
-🧪 Step 3: Data Augmentation (Optional)
+### 🧪 Step 3: Data Augmentation (Optional)
 If needed, run the augmentation script to increase dataset size:
 python Data_Augmentation.py
 
-⚙️ Step 4: Data Processing
+### ⚙️ Step 4: Data Processing
 Process each dataset by running its corresponding script:
 # ASL
 python ASL_Data_Processing.py
@@ -96,7 +96,7 @@ python ASL_Data_Processing.py
 # ISL
 python ISL_Data_Processing.py
 
-🧠 Step 5: Train Classifiers
+### 🧠 Step 5: Train Classifiers
 Train the models for each sign language:
 # ASL
 python ASL_Train_Classifier.py
@@ -104,7 +104,7 @@ python ASL_Train_Classifier.py
 # ISL
 python ISL_Train_Classifier.py
 
-🧪 Step 6: Testing
+### 🧪 Step 6: Testing
 Evaluate model performance:
 # ASL
 python ASL_Testing.py
@@ -112,7 +112,7 @@ python ASL_Testing.py
 # ISL
 python ISL_Testing.py
 
-🚀 Step 7: Deploy the Application
+### 🚀 Step 7: Deploy the Application
 Move the trained models (model_ASL and model_ISL) into the Frontend_SignLanguage/ directory.
 
 Run the app:
