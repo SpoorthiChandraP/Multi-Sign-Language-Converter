@@ -60,6 +60,7 @@ It translates hand gestures into letters using a webcam, suggests possible words
 
 **Indian Sign Language (ISL)**: Employed the [Indian Sign Language Dataset on Kaggle](https://www.kaggle.com/datasets/vaishnaviasonawane/indian-sign-language-dataset) comprising images of hand gestures used in ISL.
 
- These datasets were used to train and validate machine learning models for gesture recognition and translation into speech and text across multiple sign languages.
+These datasets were used to train and validate machine learning models for gesture recognition and translation into speech and text across multiple sign languages.
+ 
 ---
 
