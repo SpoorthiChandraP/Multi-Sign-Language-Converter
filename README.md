@@ -70,33 +70,37 @@ Follow the steps below to set up and run the AI - Based Multi Sign Language Conv
 
 ### 🔁 Step 1: Clone the Repository
 
-'''
-git clone [https://github.com/Niharika-Varshney/Multi-Sign-language-Speech-and-Text-Converter](https://github.com/SpoorthiChandraP/Multi-Sign-Language-Converter.git)
-cd Multi-Sign-language-Speech-and-Text-Converter
-'''
+    '''
+    git clone [https://github.com/Niharika-Varshney/Multi-Sign-language-Speech-and-Text-Converter](https://github.com/SpoorthiChandraP/Multi-Sign-Language-Converter.git)
+    cd Multi-Sign-language-Speech-and-Text-Converter
+    '''
 
 ### 📥 Step 2: Download Datasets
-Download the following datasets from Kaggle and save them into the specified folders:
 
-American Sign Language (ASL)
-Download the [ASL Alphabet Dataset from Kaggle](https://www.kaggle.com/datasets/grassknoted/asl-alphabet?select=asl_alphabet_train).
-Save the dataset into a directory named Data_ASL.
+1. **American Sign Language (ASL)**
+   - Download the [ASL Alphabet Dataset from Kaggle](https://www.kaggle.com/datasets/grassknoted/asl-alphabet?select=asl_alphabet_train).
+   - Save the dataset into a directory named `Data_ASL`.
 
-Indian Sign Language (ISL)
-Download the [Indian Sign Language Dataset from Kaggle](https://www.kaggle.com/datasets/vaishnaviasonawane/indian-sign-language-dataset).
-Save the dataset into a directory named Data_ISL.
+2. **Indian Sign Language (ISL)**
+   - Download the [Indian Sign Language Dataset from Kaggle](https://www.kaggle.com/datasets/vaishnaviasonawane/indian-sign-language-dataset).
+   - Save the dataset into a directory named `Data_ISL`.
 
 ### 🧪 Step 3: Data Augmentation (Optional)
 If needed, run the augmentation script to increase dataset size:
-python Data_Augmentation.py
+  ```sh
+  python Data_Augmentation.py
 
 ### ⚙️ Step 4: Data Processing
-Process each dataset by running its corresponding script:
-# ASL
-python ASL_Data_Processing.py
 
-# ISL
-python ISL_Data_Processing.py
+- Process the datasets by running the respective data processing scripts:
+  - **For American Sign Language (ASL):**
+    ```sh
+    python ASL_Data_Processing.py
+    ```
+  - **For Indian Sign Language (ISL):**
+    ```sh
+    python ISL_Data_Processing.py
+    ```
 
 ### 🧠 Step 5: Train Classifiers
 Train the models for each sign language:
