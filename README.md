@@ -105,28 +105,37 @@ If needed, run the augmentation script to increase dataset size:
     ```
 
 ### 🧠 Step 5: Train Classifiers
-Train the models for each sign language:
-# ASL
-python ASL_Train_Classifier.py
 
-# ISL
-python ISL_Train_Classifier.py
+- Train classifiers for each dataset by running the respective classifier scripts:
+  - **For American Sign Language (ASL)**:
+    ```sh
+    python ASL_Train_Classifier.py
+    ```
+  - **For Indian Sign Language (ISL)**:
+    ```sh
+    python ISL_Train_Classifier.py
+    ```
 
 ### 🧪 Step 6: Testing
-Evaluate model performance:
-# ASL
-python ASL_Testing.py
 
-# ISL
-python ISL_Testing.py
+- Testing model for each dataset by running the respective testing scripts:
+  - **For American Sign Language (ASL)**:
+    ```sh
+    python ASL_Testing.py
+    ```
+  - **For Indian Sign Language (ISL)**:
+    ```sh
+    python ISL_Testing.py
+    ```
 
 ### 🚀 Step 7: Deploy the Application
-Move the trained models (model_ASL and model_ISL) into the Frontend_SignLanguage/ directory.
+- Copy the saved models (```model_ISL```, ```model_ASL```) into the ```FRONTEND``` directory.
+- Run the application by executing ```app.py```
+  ```sh
+  python app.py
+  ```
 
-Run the app:
-python app.py
-
-Now, your application should be up and running, ready to convert ASL and ISL gestures into speech and text.
+Now, your application should be up and running, ready to convert ASL, BSL, SSL, and ISL gestures into spoken language and text.
 
 
 
