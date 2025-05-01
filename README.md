@@ -87,8 +87,10 @@ Follow the steps below to set up and run the AI - Based Multi Sign Language Conv
 
 ### 🧪 Step 3: Data Augmentation (Optional)
 If needed, run the augmentation script to increase dataset size:
-  ```sh
-  python Data_Augmentation.py
+
+    ```sh
+    python Data_Augmentation.py
+      ```
 
 ### ⚙️ Step 4: Data Processing
 
