@@ -120,3 +120,62 @@ Run the app:
 python app.py
 
 Now, your application should be up and running, ready to convert ASL and ISL gestures into speech and text.
+
+
+
+🧠 How to Use This Project
+🔁 Step 1: Clone the Repository
+bash
+Copy
+Edit
+git clone https://github.com/SpoorthiChandraP/Multi-Sign-Language-Converter.git
+cd Multi-Sign-Language-Converter
+📥 Step 2: Download Datasets
+Download the following datasets from Kaggle and save them into the specified folders:
+
+ASL: Save to Data_ASL/
+
+ISL: Save to Data_ISL/
+
+🧪 Step 3: Data Augmentation (Optional)
+bash
+Copy
+Edit
+python Data_Augmentation.py
+⚙️ Step 4: Data Processing
+bash
+Copy
+Edit
+# ASL
+python ASL_Data_Processing.py
+
+# ISL
+python ISL_Data_Processing.py
+🧠 Step 5: Train Classifiers
+bash
+Copy
+Edit
+# ASL
+python ASL_Train_Classifier.py
+
+# ISL
+python ISL_Train_Classifier.py
+🧪 Step 6: Testing Models
+bash
+Copy
+Edit
+# ASL
+python ASL_Testing.py
+
+# ISL
+python ISL_Testing.py
+🚀 Step 7: Deploy the Application
+Make sure trained models model_ASL.pkl and model_ISL.pkl are placed in the Frontend_SignLanguage/ directory.
+
+Then run the application:
+
+bash
+Copy
+Edit
+python app.py
+Now your application is ready to convert ASL and ISL gestures into speech and text in real time!
