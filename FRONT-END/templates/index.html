@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Language Detection</title>
+    <!-- Link to external CSS file -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Remove theme variables and replace with direct dark theme styles */
+        :root {
+            --bg-color: #1a1a1a;
+            --text-color: #ffffff;
+            --container-bg: #2d2d2d;
+            --border-color: #45a049;
+            --button-bg: #45a049;
+            --button-text: #ffffff;
+            --history-bg: rgba(0, 0, 0, 0.7);
+            --history-item-bg: rgba(69, 160, 73, 0.2);
+            --history-item-hover: rgba(69, 160, 73, 0.4);
+            --settings-bg: #2d2d2d;
+            --input-bg: #1a1a1a;
+            --predicted-text-bg: rgba(0, 0, 0, 0.7);
+            --predicted-text-color: #ffffff;
+            --highlight-color: #45a049;
+            --accent-color: #ffd700;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        /* Settings Panel Styles */
+        .settings-panel {
+            background-color: var(--container-bg);
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            width: 100%;
+            margin: 0;
+        }
+
+        .settings-panel h3 {
+            margin: 0 0 10px 0;
+            color: var(--text-color);
+            font-size: 1.1em;
+        }
+
+        .setting-group {
+            margin-bottom: 10px;
+        }
+
+        .setting-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .setting-group label {
+            display: block;
+            margin-bottom: 4px;
+            color: var(--text-color);
+            font-size: 0.9em;
+        }
+
+        .setting-group select {
+            width: 100%;
+            padding: 6px;
+            border-radius: 5px;
+            border: 1px solid var(--border-color);
+            background-color: var(--input-bg);
+            color: var(--text-color);
+            font-size: 0.9em;
+            cursor: pointer;
+        }
+
+        .setting-group select:focus {
+            outline: none;
+            border-color: #45a049;
+        }
+
+        .speed-options {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-top: 4px;
+        }
+
+        .speed-option {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            padding: 6px;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+
+        .theme-toggle {
+            width: 100%;
+            padding: 6px;
+            margin-top: 8px;
+            font-size: 0.9em;
+        }
+
+        /* Adjust existing styles to use CSS variables */
+        .history-container {
+            background-color: var(--history-bg);
+            border: 1px solid var(--border-color);
+        }
+
+        .history-item {
+            background-color: var(--history-item-bg);
+            color: var(--text-color);
+        }
+
+        .history-item:hover {
+            background-color: var(--history-item-hover);
+        }
+
+        .history-item .gesture-time {
+            color: var(--text-color);
+            opacity: 0.7;
+        }
+
+        /* Side-by-side layout styles */
+        .main-content {
+            display: flex;
+            flex-direction: row;
+            width: 100%;
+            max-width: 1600px;
+            margin: 0 auto;
+            gap: 20px;
+            padding: 20px;
+        }
+        
+        .left-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .right-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 15px;
+            max-width: 800px;
+            gap: 15px;  /* Even spacing between elements */
+        }
+        
+        .video-container {
+            width: 100%;
+            max-width: 100%;
+            margin: 0;
+            height: 70vh;
+        }
+        
+        .video-container img {
+            height: 100%;
+            object-fit: contain;
+        }
+        
+        .title-container {
+            margin-bottom: 20px;
+        }
+        
+        .title-container h1 {
+            font-size: 2.5em;
+        }
+        
+        .predicted-text-container {
+            background-color: var(--predicted-text-bg);
+            padding: 12px;
+            border-radius: 10px;
+            width: 100%;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border-color);
+        }
+        
+        .predicted-text-container p {
+            font-size: 1.2em;
+            margin: 0;
+            color: var(--text-color);
+        }
+        
+        #predictedText {
+            font-weight: bold;
+            color: var(--accent-color);
+            font-size: 1.4em;
+        }
+        
+        .control-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            margin: 0;
+        }
+        
+        .button {
+            padding: 8px 12px;
+            font-size: 0.9em;
+            background-color: var(--button-bg);
+            color: var(--button-text);
+            border: 1px solid var(--border-color);
+        }
+        
+        .button:hover {
+            opacity: 0.9;
+        }
+        
+        /* Gesture History Styles */
+        .history-container {
+            width: 100%;
+            background-color: var(--history-bg);
+            border-radius: 10px;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            max-height: 150px;  /* Reduced height */
+            overflow-y: auto;
+        }
+        
+        .history-container h3 {
+            color: var(--accent-color);
+            margin: 0 0 8px 0;
+            font-size: 1.1em;
+        }
+        
+        .history-list {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .history-item {
+            padding: 6px 10px;
+            margin-bottom: 4px;
+        }
+        
+        .history-item:hover {
+            background-color: var(--history-item-hover);
+        }
+        
+        .history-item .gesture-text {
+            flex-grow: 1;
+        }
+        
+        .history-item .gesture-time {
+            font-size: 0.8em;
+            color: var(--text-color);
+            margin-left: 10px;
+        }
+        
+        .history-item .reuse-btn {
+            background-color: #45a049;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            padding: 3px 8px;
+            cursor: pointer;
+            font-size: 0.8em;
+            margin-left: 10px;
+        }
+        
+        .history-item .reuse-btn:hover {
+            background-color: #3d8b40;
+        }
+        
+        /* Tooltip Styles */
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 200px;
+            background-color: var(--container-bg);
+            color: var(--text-color);
+            text-align: center;
+            border-radius: 6px;
+            padding: 10px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -100px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.9em;
+            border: 1px solid var(--border-color);
+        }
+        
+        .tooltip .tooltiptext::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: var(--container-bg) transparent transparent transparent;
+        }
+        
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 992px) {
+            .main-content {
+                flex-direction: column;
+            }
+            
+            .video-container {
+                height: 50vh;
+            }
+        }
+        
+        /* History header styles */
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .clear-history-btn {
+            background-color: #d32f2f;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+        }
+        
+        .clear-history-btn:hover {
+            background-color: #b71c1c;
+        }
+
+        /* Add these styles to your existing styles */
+        .speed-select {
+            appearance: auto !important;
+            -webkit-appearance: auto !important;
+            -moz-appearance: auto !important;
+        }
+
+        .speed-select option {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding: 5px;
+        }
+
+        .speed-select option:checked {
+            background-color: #45a049;
+            color: white;
+        }
+
+        /* Suggestions box */
+        #suggestionsBox {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            background-color: var(--predicted-text-bg);
+            border: 1px solid var(--accent-color);
+        }
+
+        #suggestionsBox strong {
+            font-size: 1.1em;
+            color: var(--accent-color);
+        }
+
+        #suggestions span {
+            padding: 4px 8px;
+            font-size: 0.9em;
+            background-color: var(--history-item-bg);
+            color: var(--text-color);
+        }
+
+        #suggestions span:hover {
+            background-color: var(--history-item-hover);
+        }
+
+        /* Add/Update these styles */
+        .stats-container {
+            position: fixed;
+            top: 70px;  /* Increased from top to prevent overlap */
+            right: 20px;
+            background-color: var(--predicted-text-bg);
+            padding: 10px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            z-index: 100;
+        }
+
+        .stats-container p {
+            margin: 5px 0;
+            font-size: 1em;
+            color: var(--text-color);
+        }
+
+        .stats-container i {
+            color: var(--highlight-color);
+            margin-right: 5px;
+        }
+
+        /* Update language badge style */
+        .language-badge {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: var(--highlight-color);
+            color: var(--button-text);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 1em;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            z-index: 100;
+        }
+
+        /* Back button */
+        .back-button {
+            background-color: var(--container-bg);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+        }
+
+        .back-button:hover {
+            background-color: var(--history-item-hover);
+        }
+    </style>
+</head>
+<body>
+    <!-- Back button -->
+    <a href="/" class="back-button">
+        <i class="fas fa-arrow-left"></i> Back
+    </a>
+
+    <!-- Language badge -->
+    <div class="language-badge">
+        <i class="fas fa-hand-paper"></i> {{ language }}
+    </div>
+
+    <!-- Stats container -->
+    <div class="stats-container">
+        <p><i class="fas fa-clock"></i> Session time: <span id="sessionTime">00:00</span></p>
+        <p><i class="fas fa-hand-paper"></i> Gestures detected: <span id="gestureCount">0</span></p>
+    </div>
+
+    <!-- Main container for centering content vertically and horizontally -->
+    <div class="container">
+        <!-- Container for the title -->
+        <div class="title-container">
+            <h1>{{ language }}</h1>
+        </div>
+        
+        <!-- Side-by-side layout -->
+        <div class="main-content">
+            <!-- Left panel - Camera input -->
+            <div class="left-panel">
+                <div class="video-container">
+                    <div class="hand-indicator">
+                        <i class="fas fa-hand-paper"></i> Hand Detection Active
+                    </div>
+                    <img id="videoElement" src="/video_feed" alt="Video feed">
+                </div>
+            </div>
+            
+            <!-- Right panel - Output elements -->
+            <div class="right-panel">
+                <!-- Predicted text container -->
+                <div class="predicted-text-container">
+                    <p>Predicted Text: <span id="predictedText"></span></p>
+                </div>
+
+                <!-- Gesture History Section -->
+                <div class="history-container">
+                    <div class="history-header">
+                        <h3><i class="fas fa-history"></i> Recent Gestures</h3>
+                        <button id="clearHistoryBtn" class="clear-history-btn tooltip">
+                            <i class="fas fa-trash-alt"></i>
+                            <span class="tooltiptext">Clear all recent gestures</span>
+                        </button>
+                    </div>
+                    <ul id="gestureHistory" class="history-list">
+                        <!-- History items will be added here dynamically -->
+                    </ul>
+                </div>
+
+                <!-- Suggestions Section -->
+                <div id="suggestionsBox" style="display: none;">
+                    <strong style="font-size: 30px; color: #ffd700;">Suggestions:</strong>
+                    <div id="suggestions" style="margin-top: 5px;"></div>
+                </div>
+
+                <!-- Control buttons -->
+                <div class="control-buttons">
+                    <button onclick="clearLastCharacter()" class="button tooltip">
+                        <i class="fas fa-backspace"></i> Clear Last Character
+                        <span class="tooltiptext">Remove the last character from the predicted text</span>
+                    </button>
+                    <button onclick="speakSentence()" class="button button2 tooltip">
+                        <i class="fas fa-volume-up"></i> Speak Sentence
+                        <span class="tooltiptext">Convert the current text to speech</span>
+                    </button>
+                    <button onclick="clearSentence()" class="button button3 tooltip">
+                        <i class="fas fa-trash"></i> Clear Sentence
+                        <span class="tooltiptext">Clear all text from the predicted text area</span>
+                    </button>
+                    <button onclick="addspace()" class="button button4 tooltip">
+                        <i class="fas fa-space-shuttle"></i> Space
+                        <span class="tooltiptext">Add a space to the predicted text</span>
+                    </button>
+                </div>
+
+                <!-- Settings Panel -->
+                <div class="settings-panel">
+                    <h3><i class="fas fa-cog"></i> Settings</h3>
+                    
+                    <div class="setting-group">
+                        <label for="textSize">Text Size:</label>
+                        <select id="textSize">
+                            <option value="small">Small</option>
+                            <option value="medium" selected>Medium</option>
+                            <option value="large">Large</option>
+                        </select>
+                    </div>
+
+                    <div class="setting-group">
+                        <label for="speechSpeed">Speech Speed:</label>
+                        <select id="speechSpeed">
+                            <option value="0.5">Slow (0.5x)</option>
+                            <option value="1.0" selected>Normal (1.0x)</option>
+                            <option value="1.5">Fast (1.5x)</option>
+                            <option value="2.0">Very Fast (2.0x)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script -->
+    <script>
+        const predictedTextElement = document.getElementById('predictedText');
+        const suggestionsBox = document.getElementById('suggestionsBox');
+        const suggestionsContainer = document.getElementById('suggestions');
+        const sessionTimeElement = document.getElementById('sessionTime');
+        const gestureCountElement = document.getElementById('gestureCount');
+        const gestureHistoryList = document.getElementById('gestureHistory');
+        
+        // Session time tracking
+        let sessionStartTime = new Date();
+        let gestureCount = 0;
+        let lastPredictedText = "";
+        let gestureHistory = [];
+        let lastUpdateTime = 0; // Track when the last update happened
+        
+        // Update session time every second
+        setInterval(() => {
+            const now = new Date();
+            const diff = Math.floor((now - sessionStartTime) / 1000);
+            const minutes = Math.floor(diff / 60).toString().padStart(2, '0');
+            const seconds = (diff % 60).toString().padStart(2, '0');
+            sessionTimeElement.textContent = `${minutes}:${seconds}`;
+        }, 1000);
+
+        // Fetch and update predicted text + suggestions
+        function updatePredictedText() {
+            fetch('/get_predicted_text')
+                .then(res => res.json())
+                .then(data => {
+                    const newText = data.predicted_text;
+                    const currentTime = Date.now();
+                    
+                    // Check if text has changed and new text is longer (indicating a new gesture)
+                    if (newText !== lastPredictedText && newText.length > lastPredictedText.length) {
+                        // Extract the new gesture (the difference between new and old text)
+                        const newGesture = newText.substring(lastPredictedText.length);
+                        
+                        // Only add to history if it's not just a space and it's been at least 500ms since last update
+                        // This helps filter out rapid changes that might be from suggestions
+                        if (newGesture.trim() && (currentTime - lastUpdateTime > 500)) {
+                            // Add to gesture history
+                            addToGestureHistory(newGesture.trim());
+                            
+                            // Update gesture count
+                            gestureCount++;
+                            gestureCountElement.textContent = gestureCount;
+                            
+                            // Update last update time
+                            lastUpdateTime = currentTime;
+                        }
+                        
+                        // Update last predicted text
+                        lastPredictedText = newText;
+                    }
+                    
+                    // Always update the displayed text
+                    predictedTextElement.textContent = newText;
+                    
+                    // Update suggestions
+                    updateSuggestions(newText);
+                });
+        }
+        
+        // Add gesture to history
+        function addToGestureHistory(gesture) {
+            // Don't add empty gestures
+            if (!gesture || gesture.trim() === '') return;
+            
+            const now = new Date();
+            const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            
+            // Check if this gesture is already the most recent one (to avoid duplicates)
+            if (gestureHistory.length > 0 && gestureHistory[0].text === gesture) {
+                return; // Skip if it's the same as the most recent gesture
+            }
+            
+            // Add to history array
+            gestureHistory.unshift({
+                text: gesture,
+                time: timeString,
+                timestamp: now.getTime()
+            });
+            
+            // Keep only the last 10 gestures
+            if (gestureHistory.length > 10) {
+                gestureHistory.pop();
+            }
+            
+            // Update the UI
+            updateGestureHistoryUI();
+            
+            // Log for debugging
+            console.log("Added gesture to history:", gesture);
+        }
+        
+        // Update the gesture history UI
+        function updateGestureHistoryUI() {
+            gestureHistoryList.innerHTML = '';
+            
+            if (gestureHistory.length === 0) {
+                const emptyItem = document.createElement('li');
+                emptyItem.textContent = 'No gestures detected yet';
+                emptyItem.style.color = '#cccccc';
+                emptyItem.style.fontStyle = 'italic';
+                gestureHistoryList.appendChild(emptyItem);
+                return;
+            }
+            
+            gestureHistory.forEach(gesture => {
+                const historyItem = document.createElement('li');
+                historyItem.className = 'history-item';
+                
+                const gestureText = document.createElement('span');
+                gestureText.className = 'gesture-text';
+                gestureText.textContent = gesture.text;
+                
+                const gestureTime = document.createElement('span');
+                gestureTime.className = 'gesture-time';
+                gestureTime.textContent = gesture.time;
+                
+                const reuseButton = document.createElement('button');
+                reuseButton.className = 'reuse-btn';
+                reuseButton.innerHTML = '<i class="fas fa-redo"></i>';
+                reuseButton.title = 'Reuse this gesture';
+                reuseButton.onclick = () => reuseGesture(gesture.text);
+                
+                historyItem.appendChild(gestureText);
+                historyItem.appendChild(gestureTime);
+                historyItem.appendChild(reuseButton);
+                
+                gestureHistoryList.appendChild(historyItem);
+            });
+        }
+        
+        // Reuse a gesture from history
+        function reuseGesture(gesture) {
+            fetch('/get_predicted_text')
+                .then(res => res.json())
+                .then(data => {
+                    const currentText = data.predicted_text;
+                    
+                    // Check if the gesture is a single letter
+                    const isSingleLetter = gesture.length === 1;
+                    
+                    // If it's a single letter, add it directly without a space
+                    // Otherwise, add a space before the gesture
+                    const newText = isSingleLetter ? 
+                        currentText + gesture : 
+                        currentText + ' ' + gesture;
+                    
+                    // Update last update time to prevent this from being added to history
+                    lastUpdateTime = Date.now();
+                    
+                    fetch('/set_predicted_text', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ text: newText })
+                    }).then(() => {
+                        predictedTextElement.textContent = newText;
+                        lastPredictedText = newText; // Update last predicted text
+                        updateSuggestions(newText);
+                    });
+                });
+        }
+
+        function clearSentence() {
+            fetch('/clear_sentence', { method: 'POST' }).then(updatePredictedText);
+        }
+
+        function clearLastCharacter() {
+            fetch('/clear_last_character', { method: 'POST' })
+                .then(res => res.json())
+                .then(data => {
+                    predictedTextElement.textContent = data.predicted_text;
+                    updateSuggestions(data.predicted_text);
+                });
+        }
+
+        function speakSentence() {
+            const speed = document.getElementById('speechSpeed').value;
+            
+            fetch('/speak_sentence', { 
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ speed: parseFloat(speed) })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Speech failed');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Failed to process speech. Please try again.');
+            });
+        }
+
+        function addspace() {
+            fetch('/add_space', { method: 'POST' });
+        }
+
+        function updateSuggestions(text) {
+            const lastWord = text.trim().split(' ').pop();
+
+            if (!lastWord || lastWord.length === 0) {
+                suggestionsBox.style.display = 'none';
+                return;
+            }
+
+            fetch('/get_suggestions')
+                .then(res => res.json())
+                .then(data => {
+                    if (data.suggestions.length > 0) {
+                        suggestionsContainer.innerHTML = "";
+                        suggestionsBox.style.display = 'block';
+
+                        data.suggestions.forEach(word => {
+                            const span = document.createElement("span");
+                            span.textContent = word;
+                            span.onclick = () => completeSuggestion(word);
+                            suggestionsContainer.appendChild(span);
+                        });
+                    } else {
+                        suggestionsBox.style.display = 'none';
+                    }
+                });
+        }
+
+        function completeSuggestion(word) {
+            fetch('/get_predicted_text')
+                .then(res => res.json())
+                .then(data => {
+                    let words = data.predicted_text.trim().split(' ');
+                    words[words.length - 1] = word;
+                    const newText = words.join(' ') + " ";
+                    predictedTextElement.textContent = newText;
+                    
+                    // Update last update time to prevent this from being added to history
+                    lastUpdateTime = Date.now();
+
+                    fetch('/set_predicted_text', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ text: newText })
+                    });
+
+                    // Hide suggestions after selection
+                    suggestionsBox.style.display = 'none';
+                });
+        }
+
+        // Clear gesture history
+        document.getElementById('clearHistoryBtn').addEventListener('click', function() {
+            gestureHistory = [];
+            updateGestureHistoryUI();
+        });
+
+        setInterval(updatePredictedText, 1000);
+
+        // Text size adjustment
+        document.getElementById('textSize').addEventListener('change', function() {
+            const size = this.value;
+            document.body.style.fontSize = size === 'small' ? '14px' : 
+                                          size === 'medium' ? '16px' : '18px';
+        });
+
+        // Load saved settings on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load text size
+            const savedTextSize = localStorage.getItem('textSize') || 'medium';
+            document.getElementById('textSize').value = savedTextSize;
+            document.body.style.fontSize = savedTextSize === 'small' ? '14px' : 
+                                         savedTextSize === 'medium' ? '16px' : '18px';
+
+            // Initialize speech speed
+            const defaultSpeed = '1.0';
+            const savedSpeed = localStorage.getItem('speechSpeed') || defaultSpeed;
+            document.getElementById('speechSpeed').value = savedSpeed;
+
+            // Add event listener for speech speed changes
+            document.getElementById('speechSpeed').addEventListener('change', function() {
+                localStorage.setItem('speechSpeed', this.value);
+            });
+        });
+    </script>
+</body>
+</html>
